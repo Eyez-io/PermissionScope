@@ -58,6 +58,7 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
     public var deniedIconLabelString: String? = nil
     public var disabledIconLabelString: String? = nil
     
+    public var iconLabelFont: UIFont = UIFont.systemFontOfSize(12)
     public var iconLabelStringByTypeMap: [PermissionType: String?] = [:]
     
     /// Messages for the body label of the dialog presented when requesting access.
@@ -363,7 +364,7 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
         if let iconTitle = self.iconLabelStringByTypeMap[type] {
             let iconLabel = UILabel(frame: CGRect(x: 5, y: 5, width: 30, height: 30))
             iconLabel.backgroundColor = UIColor.clearColor()
-            iconLabel.font = UIFont.systemFontOfSize(12)
+            iconLabel.font = self.iconLabelFont
             iconLabel.textColor = self.permissionButtonTextColor
             iconLabel.tag = 1
             iconLabel.text = iconTitle
