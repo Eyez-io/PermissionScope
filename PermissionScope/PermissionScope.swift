@@ -316,13 +316,13 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
         if let nonNilIcon = icon {
             iconLabel?.hidden = false
             iconLabel?.text = nonNilIcon
-            mainLabelOffset = 40
+            mainLabelOffset = 50
         }
         else {
             iconLabel?.hidden = true
         }
 
-        mainLabel.frame = CGRect(x: mainLabelOffset, y: 0, width: 220 - mainLabelOffset, height: 40)
+        mainLabel.frame = CGRect(x: mainLabelOffset, y: 0, width: 220 - mainLabelOffset - 15, height: 40)
     }
     
     // MARK: - Customizing the permissions
@@ -362,17 +362,17 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
 
         var mainLabelOffset = 15
         if let iconTitle = self.iconLabelStringByTypeMap[type] {
-            let iconLabel = UILabel(frame: CGRect(x: 5, y: 5, width: 30, height: 30))
+            let iconLabel = UILabel(frame: CGRect(x: 15, y: 5, width: 30, height: 30))
             iconLabel.backgroundColor = UIColor.clearColor()
             iconLabel.font = self.iconLabelFont
             iconLabel.textColor = self.permissionButtonTextColor
             iconLabel.tag = 1
             iconLabel.text = iconTitle
             containerView.addSubview(iconLabel)
-            mainLabelOffset = 40
+            mainLabelOffset = 50
         }
         
-        let mainLabel = UILabel(frame: CGRect(x: mainLabelOffset, y: 0, width: 220 - mainLabelOffset, height: 40))
+        let mainLabel = UILabel(frame: CGRect(x: mainLabelOffset, y: 0, width: 220 - mainLabelOffset - 15, height: 40))
         mainLabel.backgroundColor = UIColor.clearColor()
         mainLabel.font = self.buttonFont
         mainLabel.textColor = self.permissionButtonTextColor
