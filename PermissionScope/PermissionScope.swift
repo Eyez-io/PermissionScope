@@ -54,23 +54,11 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
     /// Color used for permission buttons with unauthorized status. By default, inverse of `authorizedButtonColor`.
     public var unauthorizedButtonColor:UIColor?
     
-    public var allowedIconLabelString: String = "V"
-    public var deniedIconLabelString: String = "X"
-    public var disabledIconLabelString: String = "-"
+    public var allowedIconLabelString: String? = nil
+    public var deniedIconLabelString: String? = nil
+    public var disabledIconLabelString: String? = nil
     
-    public var iconLabelStringByTypeMap: [PermissionType: String] = [
-        .Bluetooth: "BT",
-        .Camera: "CA",
-        .Contacts: "CO",
-        .Events: "EV",
-        .LocationAlways: "LA",
-        .LocationInUse: "LU",
-        .Microphone: "MI",
-        .Motion: "MO",
-        .Notifications: "NO",
-        .Photos: "PH",
-        .Reminders: "RE"
-    ]
+    public var iconLabelStringByTypeMap: [PermissionType: String?] = [:]
     
     /// Messages for the body label of the dialog presented when requesting access.
     lazy var permissionMessages: [PermissionType : String?] = [:]
@@ -297,20 +285,21 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
 
             self.statusForPermission(type,
                 completion: { currentStatus in
-                    if let iconLabel = bcv.viewWithTag(1) as? UILabel, let mainLabel = bcv.viewWithTag(2) as? UILabel {
+                    if let mainLabel = bcv.viewWithTag(2) as? UILabel {
+                        let iconLabel = bcv.viewWithTag(1) as? UILabel
                         let prettyDescription = type.prettyDescription
                         if currentStatus == .Authorized {
                             self.setButtonContainerViewAuthorizedStyle(bcv)
-                            mainLabel.text = "Allowed \(prettyDescription)".localized.uppercaseString
-                            iconLabel.text = self.allowedIconLabelString
+                            mainLabel.text = "Allowed \(prettyDescription)".localized
+                            self.configureMainLabel(mainLabel, andIconLabel: iconLabel, forIcon: self.allowedIconLabelString)
                         } else if currentStatus == .Unauthorized {
                             self.setButtonContainerViewUnauthorizedStyle(bcv)
-                            mainLabel.text = "Denied \(prettyDescription)".localized.uppercaseString
-                            iconLabel.text = self.deniedIconLabelString
+                            mainLabel.text = "Denied \(prettyDescription)".localized
+                            self.configureMainLabel(mainLabel, andIconLabel: iconLabel, forIcon: self.deniedIconLabelString)
                         } else if currentStatus == .Disabled {
                             //                setButtonDisabledStyle(button)
-                            mainLabel.text = "\(prettyDescription) Disabled".localized.uppercaseString
-                            iconLabel.text = self.disabledIconLabelString
+                            mainLabel.text = "\(prettyDescription) Disabled".localized
+                            self.configureMainLabel(mainLabel, andIconLabel: iconLabel, forIcon: self.disabledIconLabelString)
                         }
                     }
             })
@@ -321,6 +310,20 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
         self.contentView.center = CGPoint(x: self.baseView.bounds.size.width / 2, y: self.baseView.bounds.size.height / 2)
     }
 
+    func configureMainLabel(mainLabel: UILabel, andIconLabel iconLabel: UILabel?, forIcon icon: String?) {
+        var mainLabelOffset = 15
+        if let nonNilIcon = icon {
+            iconLabel?.hidden = false
+            iconLabel?.text = nonNilIcon
+            mainLabelOffset = 40
+        }
+        else {
+            iconLabel?.hidden = true
+        }
+
+        mainLabel.frame = CGRect(x: mainLabelOffset, y: 0, width: 220 - mainLabelOffset, height: 40)
+    }
+    
     // MARK: - Customizing the permissions
     
     /**
@@ -356,15 +359,19 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
         containerView.layer.borderColor = self.permissionButtonBorderColor.CGColor
         containerView.layer.cornerRadius = self.permissionButtonCornerRadius
 
-        let iconLabel = UILabel(frame: CGRect(x: 5, y: 5, width: 30, height: 30))
-        iconLabel.backgroundColor = UIColor.clearColor()
-        iconLabel.font = UIFont.systemFontOfSize(12)
-        iconLabel.textColor = self.permissionButtonTextColor
-        iconLabel.tag = 1
-        iconLabel.text = self.iconLabelStringByTypeMap[type] ?? ""
-        containerView.addSubview(iconLabel)
+        var mainLabelOffset = 15
+        if let iconTitle = self.iconLabelStringByTypeMap[type] {
+            let iconLabel = UILabel(frame: CGRect(x: 5, y: 5, width: 30, height: 30))
+            iconLabel.backgroundColor = UIColor.clearColor()
+            iconLabel.font = UIFont.systemFontOfSize(12)
+            iconLabel.textColor = self.permissionButtonTextColor
+            iconLabel.tag = 1
+            iconLabel.text = iconTitle
+            containerView.addSubview(iconLabel)
+            mainLabelOffset = 40
+        }
         
-        let mainLabel = UILabel(frame: CGRect(x: 40, y: 0, width: 180, height: 40))
+        let mainLabel = UILabel(frame: CGRect(x: mainLabelOffset, y: 0, width: 220 - mainLabelOffset, height: 40))
         mainLabel.backgroundColor = UIColor.clearColor()
         mainLabel.font = self.buttonFont
         mainLabel.textColor = self.permissionButtonTextColor
